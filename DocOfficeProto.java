@@ -310,7 +310,7 @@ public class DocOfficeProto extends Application {
 
         TextField enterPatientIDField = new TextField();
         Button loadButton = new Button("Load Patient ID");
-        TextField patientHistory = new TextField("Patient History:");
+        TextArea patientHistory = new TextArea("Patient History:");
         patientHistory.setEditable(false);
         patientHistory.setVisible(false);
         Label testFindingsLabel = new Label("Test Findings:");
