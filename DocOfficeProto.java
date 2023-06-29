@@ -323,6 +323,14 @@ public class DocOfficeProto extends Application {
 
         homeButton.setOnAction(actionEvent -> showHomeScreen(d));
 
+        saveFindingsButton.setOnAction(actionEvent -> {
+            String testFindings = testFindingsField.getText();
+            String existingHistory = patientHistory.getText();
+            String updatedHistory = existingHistory + "\n" + testFindings;
+            patientHistory.setText(updatedHistory);
+            testFindingsField.clear();
+        });
+
         Label prescribeLabel = new Label("Medication Name:");
         prescribeLabel.setVisible(false);
         TextField medicationNameField = new TextField();
