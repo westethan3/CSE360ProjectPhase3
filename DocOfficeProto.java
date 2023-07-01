@@ -1,10 +1,24 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.LinkedList;
 
@@ -68,7 +82,7 @@ public class DocOfficeProto extends Application {
                 if (d.getFirstName().equals(firstNameField.getText()) &&
                         d.getLastName().equals(lastNameField.getText()) &&
                         d.getBirthDate().isEqual(selectedDate)) {
-                        showHomeScreen(d);
+                    showHomeScreen(d);
                 }
             }
         });
@@ -369,42 +383,118 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(savePrescriptionButton, 2, 6);
     }
 
-    private void createMessagesPane(User u) {
+    public void createMessagesPane(User u) {
         messagesPane = new VBox();
         messagesPane.setSpacing(10);
         messagesPane.setPadding(new Insets(10));
 
-        Label currentPersonLabel = new Label("Messaging Staff");
+        ScrollPane scrollPane = new ScrollPane();
+        VBox messagesContainer = new VBox();
+        scrollPane.setContent(messagesContainer);
+        scrollPane.setFitToWidth(true);
+
+        messagesContainer.setPadding(new Insets(10));
+        messagesContainer.setSpacing(1);
+
+        scrollPane.setPadding(new Insets(0, 0, 10, 0));
+        scrollPane.setPrefHeight(100);
+        scrollPane.setStyle("-fx-border-color: black; -fx-border-width: 1px;");
+
+        Label currentPersonLabel = new Label("Staff ID:");
 
         TextField personIdTextField = new TextField();
-        personIdTextField.setPromptText("Enter person's ID");
+
+        //Add messages from file here
 
         TextArea messageTextArea = new TextArea();
+        messageTextArea.setMinHeight(20);
         messageTextArea.setPromptText("Type a new message");
         messageTextArea.setPrefRowCount(5);
+        messageTextArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+            }
+        });
 
         Button sendButton = new Button("Send");
+        sendButton.setOnAction(event -> {
+            String message = messageTextArea.getText().trim();
+            if (!message.isEmpty()) {
+                messagesContainer.getChildren().add(createMessageEntry(message, true));
+
+                String currentDirectory = System.getProperty("user.dir");
+                String filePath = currentDirectory + File.separator + u.getUserID() + ".txt";
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+
+                    writer.write("To: " + personIdTextField.getText());
+                    writer.newLine();
+                    writer.write(messageTextArea.getText());
+                    writer.newLine();
+                    System.out.println("Data appended to the file successfully.");
+                } catch (IOException e) {
+                    System.out.println("An error occurred while appending the file.");
+                }
+
+                filePath = currentDirectory + File.separator + personIdTextField.getText() + ".txt";
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+
+                    writer.write("From: " + u.getUserID());
+                    writer.newLine();
+                    writer.write(messageTextArea.getText());
+                    writer.newLine();
+                    System.out.println("Data appended to the file successfully.");
+                } catch (IOException e) {
+                    System.out.println("An error occurred while appending the file.");
+                }
+
+                messageTextArea.clear();
+                Platform.runLater(() -> scrollPane.setVvalue(1.0));
+            }
+        });
 
         Button homeButton = new Button("Home");
         homeButton.setOnAction(event -> {
             if (u.getClass().equals(Patient.class)) {
                 showHomeScreenPatient((Patient) u);
-            }
-            else if (u.getClass().equals(Nurse.class)) {
-                showHomeScreen((Nurse) u);
-            }
-            else {
-                showHomeScreen((Doctor) u);
+            } else if (u.getClass().equals(Nurse.class)) {
+                showHomeScreen(u);
+            } else {
+                showHomeScreen(u);
             }
         });
 
         messagesPane.getChildren().addAll(
                 currentPersonLabel,
                 personIdTextField,
+                scrollPane,
                 messageTextArea,
                 sendButton,
                 homeButton
         );
+    }
+
+    private HBox createMessageEntry(String message, boolean isCurrentUser) {
+        HBox messageEntry = new HBox();
+        messageEntry.setSpacing(10);
+        messageEntry.setAlignment(isCurrentUser ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+        Text messageText = new Text("   " + message);
+
+        double textWidth = messageText.getLayoutBounds().getWidth();
+        double textHeight = messageText.getLayoutBounds().getHeight();
+
+        Rectangle backgroundRect = new Rectangle(textWidth + 10, textHeight + 10);
+        backgroundRect.setFill(isCurrentUser ? Color.LIGHTBLUE : Color.LIGHTGREEN);
+        backgroundRect.setArcWidth(10);
+        backgroundRect.setArcHeight(10);
+
+        StackPane messageContainer = new StackPane(backgroundRect, messageText);
+        messageContainer.setAlignment(Pos.CENTER_LEFT);
+
+        messageEntry.getChildren().add(messageContainer);
+
+        return messageEntry;
     }
 
     private void createUpdateContactPane(Patient p) {
