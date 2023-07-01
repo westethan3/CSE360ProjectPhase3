@@ -1,12 +1,5 @@
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import java.io.File;
 import java.time.LocalDate;
-import java.util.LinkedList;
 
 class User {
     private String firstName;
@@ -14,6 +7,7 @@ class User {
     private String phoneNumber;
     private String userID;
     private final LocalDate birthDate;
+    File messageLog;
 
     public User(String firstName, String lastName, LocalDate birthDate, String phoneNumber) {
         this.firstName = firstName;
@@ -21,6 +15,7 @@ class User {
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
         generateID();
+        loadMessages(userID);
     }
 
     public void generateID() {
@@ -58,6 +53,18 @@ class User {
     public String getUserID() {
         return userID;
     }
+
+    public void loadMessages(String userID) {
+        String fileName = userID + ".txt";
+        File file = new File(fileName);
+
+        if (file.exists()) {
+            messageLog = file;
+            System.out.println("File loaded successfully.");
+        }
+    }
+
+    public File getMessageLog() {return messageLog;}
 }
 
 class Patient extends User{
