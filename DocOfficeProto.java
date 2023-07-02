@@ -34,12 +34,14 @@ public class DocOfficeProto extends Application {
     private VBox messagesPane;
     private VBox updateContactPane;
     private Scene signInScene;
+    //LinkedLists used for tracking user data and holding memory
     LinkedList<Patient> patientList = new LinkedList<>();
     LinkedList<Doctor> doctorList = new LinkedList<>();
     LinkedList<Nurse> nurseList = new LinkedList<>();
 
     @Override
     public void start(Stage primaryStage) {
+        //instantiating initial sign-in screen for the user to first see when starting up the system
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Doctor's Office");
         createSignInPane();
@@ -48,6 +50,7 @@ public class DocOfficeProto extends Application {
         showSignInScreen();
     }
 
+    //used for sign-in usage by the user whether they are a a patient, doctor, or nurse
     private void createSignInPane() {
         signInPane = new GridPane();
         signInPane.setPadding(new Insets(10));
@@ -62,6 +65,7 @@ public class DocOfficeProto extends Application {
         signInButton.setOnAction(event -> {
             LocalDate selectedDate = dobPicker.getValue();
 
+            //confirms that all of the textboxes are identical to the specific user before allowing them in
             for (Patient p : patientList) {
                 if (p.getFirstName().equals(firstNameField.getText()) &&
                         p.getLastName().equals(lastNameField.getText()) &&
@@ -69,7 +73,7 @@ public class DocOfficeProto extends Application {
                     showHomeScreenPatient(p);
                 }
             }
-
+            //confirms that all of the textboxes are identical to the specific user before allowing them in
             for (Nurse n : nurseList) {
                 if (n.getFirstName().equals(firstNameField.getText()) &&
                         n.getLastName().equals(lastNameField.getText()) &&
@@ -77,7 +81,7 @@ public class DocOfficeProto extends Application {
                     showHomeScreen(n);
                 }
             }
-
+             //confirms that all of the textboxes are identical to the specific user before allowing them in
             for (Doctor d : doctorList) {
                 if (d.getFirstName().equals(firstNameField.getText()) &&
                         d.getLastName().equals(lastNameField.getText()) &&
@@ -90,6 +94,7 @@ public class DocOfficeProto extends Application {
         Button createAccountButton = new Button("Create New Account");
         createAccountButton.setOnAction(event -> showCreateAccountScreen());
 
+        //generic sign in screen for all users with specific data to fill in to log in
         signInPane.add(new Label("First Name:"), 0, 0);
         signInPane.add(firstNameField, 1, 0);
         signInPane.add(new Label("Last Name:"), 0, 1);
@@ -100,6 +105,7 @@ public class DocOfficeProto extends Application {
         signInPane.add(createAccountButton, 0, 3);
     }
 
+    //used to allow the users to create accounts by selecing specific options and entering the necessary data
     private void createCreateAccountPane() {
         createAccountPane = new GridPane();
         createAccountPane.setPadding(new Insets(10));
@@ -120,7 +126,10 @@ public class DocOfficeProto extends Application {
         TextField enterPhoneNumberField = new TextField();
 
         Button createAccountButton = new Button("Create Account");
+        /* functionality for all users after selecting a specific option 
+        their account is created and they are notified with an account created screen */
         createAccountButton.setOnAction(event -> {
+            //checks if the user checked the patient button and adds them to the patient linked list
             if (patientRadioButton.isSelected()) {
                 Patient newPatient = new Patient(enterFirstNameField.getText(),
                         enterLastNameField.getText(),
@@ -129,6 +138,7 @@ public class DocOfficeProto extends Application {
                 patientList.add(newPatient);
                 showAccountCreatedScreen();
             }
+            //checks if the user checked the nurse button and adds them to the nurse linked list
             else if (nurseRadioButton.isSelected()) {
                 Nurse newNurse = new Nurse(enterFirstNameField.getText(),
                         enterLastNameField.getText(),
@@ -137,6 +147,7 @@ public class DocOfficeProto extends Application {
                 nurseList.add(newNurse);
                 showAccountCreatedScreen();
             }
+            //checks if the user checked the doctor button and adds them to the doctor linked list
             else if (doctorRadioButton.isSelected()) {
                 Doctor newDoctor = new Doctor(enterFirstNameField.getText(),
                         enterLastNameField.getText(),
@@ -162,7 +173,7 @@ public class DocOfficeProto extends Application {
         createAccountPane.add(createAccountButton, 0, 5, 4, 1);
     }
 
-
+    //used to let the user know their account was created and has them return back to the sign in screen to log in
     private void createAccountCreatedPane() {
         accountCreatedPane = new VBox();
         accountCreatedPane.setPadding(new Insets(10));
@@ -176,6 +187,7 @@ public class DocOfficeProto extends Application {
         accountCreatedPane.getChildren().addAll(accountCreatedLabel, returnToSignInButton);
     }
 
+    //patient home screen to allow them to view their history, messages, and update any contact information
     private void createPatientHomePane(Patient p) {
         patientHomePane = new VBox();
         patientHomePane.setSpacing(10);
@@ -209,6 +221,7 @@ public class DocOfficeProto extends Application {
         );
     }
 
+    //home page used for both doctors and nurses to access given information about a patient and messages
     private void createStaffHomePane(User u) {
         staffHomePane = new VBox();
         staffHomePane.setSpacing(10);
@@ -241,6 +254,7 @@ public class DocOfficeProto extends Application {
         );
     }
 
+    //interface specific to the nurse that allows them to input the given information from a patient while doing their intake
     private void createViewPatientNursePane(Nurse n) {
         viewPatientPane = new GridPane();
         viewPatientPane.setPadding(new Insets(10));
@@ -255,12 +269,14 @@ public class DocOfficeProto extends Application {
         CheckBox overTwelveCheckbox = new CheckBox();
         TextField enterBloodPressure = new TextField();
 
+        //enters the patients information into their account
         Button enterVitalsButton = new Button("Enter Vitals");
         enterVitalsButton.setOnAction(event -> {
             showHealthQuestionsScreen(n, enterPatientIDField.getText());
 
         });
 
+        //information to be taken from the patient by the nurse
         viewPatientPane.add(new Label("Patient ID:"), 0, 0);
         viewPatientPane.add(enterPatientIDField, 1, 0);
         viewPatientPane.add(new Label("Date of Birth:"), 0, 1);
@@ -278,12 +294,14 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(enterVitalsButton, 0, 7, 2, 1);
     }
 
+    //health questions screen for the nurse to use to get more information from the patient about their health
     private void createHealthQuestionsPane(Nurse n, String id) {
         healthQuestionPane = new GridPane();
         healthQuestionPane.setPadding(new Insets(10));
         healthQuestionPane.setHgap(10);
         healthQuestionPane.setVgap(10);
 
+        //health questions with places for the nurse to enter data
         healthQuestionPane.add(new Label("Known Allergies:"), 0, 0);
         healthQuestionPane.add(new TextField(), 0, 1, 2, 1);
 
@@ -299,6 +317,7 @@ public class DocOfficeProto extends Application {
         healthQuestionPane.add(new Label("Immunizations:"), 0, 8);
         healthQuestionPane.add(new TextField(), 0, 9, 2, 1);
 
+        //lets the nurse know the information was entered and added to the patient's account
         Label responsesEnteredLabel = new Label("Responses Entered!");
         responsesEnteredLabel.setVisible(false);
         healthQuestionPane.add(responsesEnteredLabel, 1, 10);
@@ -306,6 +325,7 @@ public class DocOfficeProto extends Application {
         Button enterHealthQuestionsButton = new Button("Enter Responses");
         healthQuestionPane.add(enterHealthQuestionsButton, 1, 11);
 
+        //allows the nurse to go back to the home page after entering patient information
         Button homeButton = new Button("Home");
         healthQuestionPane.add(homeButton, 0, 11);
 
@@ -316,12 +336,14 @@ public class DocOfficeProto extends Application {
         });
     }
 
+    //interface specific to the doctor to allow them to access patient information and add new information when necessary
     private void createViewPatientDoctorPane(Doctor d) {
         viewPatientPane = new GridPane();
         viewPatientPane.setPadding(new Insets(10));
         viewPatientPane.setHgap(10);
         viewPatientPane.setVgap(10);
 
+        //screen for entering and viewing patient history and findings
         TextField enterPatientIDField = new TextField();
         Button loadButton = new Button("Load Patient ID");
         TextArea patientHistory = new TextArea("Patient History:");
@@ -345,6 +367,7 @@ public class DocOfficeProto extends Application {
             testFindingsField.clear();
         });
 
+        //gives the doctor the option to prescribe medication to the patient given their health concerns
         Label prescribeLabel = new Label("Medication Name:");
         prescribeLabel.setVisible(false);
         TextField medicationNameField = new TextField();
@@ -383,6 +406,7 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(savePrescriptionButton, 2, 6);
     }
 
+    //allows users to send and receive/view messages from other people in the clinic 
     public void createMessagesPane(User u) {
         messagesPane = new VBox();
         messagesPane.setSpacing(10);
@@ -404,8 +428,12 @@ public class DocOfficeProto extends Application {
 
         TextField personIdTextField = new TextField();
 
+        
+        //#######################################
         //Add messages from file here
+        //#######################################
 
+        //gives the user the option to send a new message
         TextArea messageTextArea = new TextArea();
         messageTextArea.setMinHeight(20);
         messageTextArea.setPromptText("Type a new message");
@@ -417,6 +445,7 @@ public class DocOfficeProto extends Application {
         });
 
         Button sendButton = new Button("Send");
+        //allows the user to send messages with a file by either creating a new file or appending to the previous messages
         sendButton.setOnAction(event -> {
             String message = messageTextArea.getText().trim();
             if (!message.isEmpty()) {
