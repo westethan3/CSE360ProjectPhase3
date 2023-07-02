@@ -112,6 +112,7 @@ public class DocOfficeProto extends Application {
         createAccountPane.setHgap(10);
         createAccountPane.setVgap(10);
 
+        //buttons used for the user to determine their role in our system
         ToggleGroup roleToggleGroup = new ToggleGroup();
         RadioButton patientRadioButton = new RadioButton("Patient");
         RadioButton nurseRadioButton = new RadioButton("Nurse");
@@ -158,6 +159,7 @@ public class DocOfficeProto extends Application {
             }
         });
 
+        //specific buttons and labels added to the pane to organize the data the user will input to make an account
         createAccountPane.add(new Label("Select Title:"), 0, 0);
         createAccountPane.add(patientRadioButton, 1, 0);
         createAccountPane.add(nurseRadioButton, 2, 0);
