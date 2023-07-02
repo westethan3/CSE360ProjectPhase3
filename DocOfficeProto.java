@@ -456,6 +456,7 @@ public class DocOfficeProto extends Application {
                 String currentDirectory = System.getProperty("user.dir");
                 String filePath = currentDirectory + File.separator + u.getUserID() + ".txt";
 
+                //option to make a new file to write in
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
 
                     writer.write("To: " + personIdTextField.getText());
@@ -467,6 +468,7 @@ public class DocOfficeProto extends Application {
                     System.out.println("An error occurred while appending the file.");
                 }
 
+                //option to append to previous messages
                 filePath = currentDirectory + File.separator + personIdTextField.getText() + ".txt";
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
 
@@ -484,6 +486,7 @@ public class DocOfficeProto extends Application {
             }
         });
 
+        //creates home button to return to home screen
         Button homeButton = new Button("Home");
         homeButton.setOnAction(event -> {
             if (u.getClass().equals(Patient.class)) {
@@ -495,6 +498,7 @@ public class DocOfficeProto extends Application {
             }
         });
 
+        //creates messages screen
         messagesPane.getChildren().addAll(
                 currentPersonLabel,
                 personIdTextField,
@@ -505,6 +509,7 @@ public class DocOfficeProto extends Application {
         );
     }
 
+    //HBox for creating messages screen, positions messages based on which user sent them (current user or other user)
     private HBox createMessageEntry(String message, boolean isCurrentUser) {
         HBox messageEntry = new HBox();
         messageEntry.setSpacing(10);
@@ -528,6 +533,7 @@ public class DocOfficeProto extends Application {
         return messageEntry;
     }
 
+    //VBox for the Update Contact Info screen
     private void createUpdateContactPane(Patient p) {
         updateContactPane = new VBox();
         updateContactPane.setSpacing(10);
@@ -566,11 +572,13 @@ public class DocOfficeProto extends Application {
         );
     }
 
+    //Method for showing the sign-in screen
     private void showSignInScreen() {
         primaryStage.setScene(signInScene);
         primaryStage.show();
     }
 
+    //Method for showing the create account screen
     private void showCreateAccountScreen() {
         createCreateAccountPane();
         Scene scene = new Scene(createAccountPane);
@@ -578,6 +586,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the "Account Created" screen
     private void showAccountCreatedScreen() {
         createAccountCreatedPane();
         Scene scene = new Scene(accountCreatedPane);
@@ -585,6 +594,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the patient home screen
     private void showHomeScreenPatient(Patient p) {
         createPatientHomePane(p);
         Scene scene = new Scene(patientHomePane);
@@ -592,6 +602,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the doctor/nurse home screen
     private void showHomeScreen(User u) {
         createStaffHomePane(u);
         Scene scene = new Scene(staffHomePane);
@@ -599,6 +610,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the messages screen
     private void showMessagesScreen(User u) {
         createMessagesPane(u);
         Scene scene = new Scene(messagesPane);
@@ -606,6 +618,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the update contact info screen
     private void showUpdateContactScreen(Patient p) {
         createUpdateContactPane(p);
         Scene scene = new Scene(updateContactPane);
@@ -613,6 +626,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the nurse's view patient screen
     private void showViewPatientScreen(Nurse n) {
         createViewPatientNursePane(n);
         Scene scene = new Scene(viewPatientPane);
@@ -620,6 +634,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the doctor's view patient screen
     private void showViewPatientScreen(Doctor d) {
         createViewPatientDoctorPane(d);
         Scene scene = new Scene(viewPatientPane);
@@ -627,6 +642,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Method for showing the nurse's health questions screen
     private void showHealthQuestionsScreen(Nurse n, String id) {
         createHealthQuestionsPane(n, id);
         Scene scene = new Scene(healthQuestionPane);
@@ -634,6 +650,7 @@ public class DocOfficeProto extends Application {
         primaryStage.show();
     }
 
+    //Obviously the main function lol
     public static void main(String[] args) {
         launch(args);
     }
