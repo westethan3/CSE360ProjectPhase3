@@ -1,6 +1,7 @@
 import java.io.File;
 import java.time.LocalDate;
 
+//class to hold the date for each individual user to allow them to continue to use the system
 class User {
     private String firstName;
     private String lastName;
@@ -18,10 +19,12 @@ class User {
         loadMessages(userID);
     }
 
+    //creates an ID based on their information for them to keep track of their account
     public void generateID() {
         userID = firstName + lastName.charAt(0) + birthDate.getMonthValue() + birthDate.getDayOfMonth() + birthDate.getYear();
     }
 
+    //getters and setters for the necessary data for each account to allow changes later on or searching for a specific person
     public String getFirstName() {
         return firstName;
     }
