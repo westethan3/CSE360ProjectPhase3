@@ -468,7 +468,7 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(savePrescriptionButton, 2, 6);
     }
 
-    //allows users to send and receive/view messages from other people in the clinic
+    //allows users to send and receive/view messages from other people in the clinic using a buffer reader and file IO
     public void createMessagesPane(User u) {
         messagesPane = new VBox();
         messagesPane.setSpacing(10);
