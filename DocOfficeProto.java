@@ -106,6 +106,17 @@ public class DocOfficeProto extends Application {
     }
 
     //used to allow the users to create accounts by selecing specific options and entering the necessary data
+    public class PatientInfo {
+        private static String history = "";
+
+        public static String getHistory() {
+            return history;
+        }
+
+        public static void addToHistory(String content) {
+            history += "\n" + content;
+        }
+    }
     private void createCreateAccountPane() {
         createAccountPane = new GridPane();
         createAccountPane.setPadding(new Insets(10));
