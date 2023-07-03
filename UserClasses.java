@@ -1,5 +1,3 @@
-package com.example.hw1360;
-
 import java.io.File;
 import java.time.LocalDate;
 
