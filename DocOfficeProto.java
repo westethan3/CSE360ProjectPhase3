@@ -81,7 +81,7 @@ public class DocOfficeProto extends Application {
                     showHomeScreen(n);
                 }
             }
-             //confirms that all of the textboxes are identical to the specific user before allowing them in
+            //confirms that all of the textboxes are identical to the specific user before allowing them in
             for (Doctor d : doctorList) {
                 if (d.getFirstName().equals(firstNameField.getText()) &&
                         d.getLastName().equals(lastNameField.getText()) &&
@@ -127,7 +127,7 @@ public class DocOfficeProto extends Application {
         TextField enterPhoneNumberField = new TextField();
 
         Button createAccountButton = new Button("Create Account");
-        /* functionality for all users after selecting a specific option 
+        /* functionality for all users after selecting a specific option
         their account is created and they are notified with an account created screen */
         createAccountButton.setOnAction(event -> {
             //checks if the user checked the patient button and adds them to the patient linked list
@@ -198,10 +198,19 @@ public class DocOfficeProto extends Application {
         Label contactInfoLabel = new Label("Contact Information for " + p.getUserID() + ":");
         Label nameLabel = new Label("Name - " + p.getFirstName() + " " + p.getLastName());
         Label phoneLabel = new Label("Phone - " + p.getPhoneNumber());
+        
+        ///////////////////////////////
 
         TextArea historyTextArea = new TextArea();
+        historyTextArea.setVisible(false);
         historyTextArea.setEditable(false);
-        historyTextArea.setText("History:");
+        
+        if (!(p.getPatientHistory() == null)) {
+            historyTextArea.setText("History: " + p.getPatientHistory());
+            historyTextArea.setVisible(true);
+        }
+        
+        ///////////////////////////
 
         Button updateContactButton = new Button("Update Contact Information");
         updateContactButton.setOnAction(event -> showUpdateContactScreen(p));
@@ -274,8 +283,25 @@ public class DocOfficeProto extends Application {
         //enters the patients information into their account
         Button enterVitalsButton = new Button("Enter Vitals");
         enterVitalsButton.setOnAction(event -> {
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    if (overTwelveCheckbox.isSelected()) {
+                        p.updateHistory("\n\nDate of Birth: " + enterDobPicker.getValue() +
+                                "\nWeight: " + enterWeightField.getText() + " lbs" +
+                                "\nHeight: " + enterHeightField.getText() + " inches" +
+                                "\nBody Temperature: " + enterBodyTempField.getText() + " Fahrenheit" +
+                                "\nBlood Pressure: " + enterBloodPressure.getText() + " SYS(mmHg)/DIA(mmHg)");
+                    }
+                    else {
+                        p.updateHistory("\n\nDate of Birth: " + enterDobPicker.getValue() +
+                                "\nWeight: " + enterWeightField.getText() + " lbs" +
+                                "\nHeight: " + enterHeightField.getText() + " inches" + "" +
+                                "\nBody Temperature: " + enterBodyTempField.getText() + " Fahrenheit");
+                    }
+                    break;
+                }
+            }
             showHealthQuestionsScreen(n, enterPatientIDField.getText());
-
         });
 
         //information to be taken from the patient by the nurse
@@ -305,19 +331,24 @@ public class DocOfficeProto extends Application {
 
         //health questions with places for the nurse to enter data
         healthQuestionPane.add(new Label("Known Allergies:"), 0, 0);
-        healthQuestionPane.add(new TextField(), 0, 1, 2, 1);
+        TextField enterAllergiesField = new TextField();
+        healthQuestionPane.add(enterAllergiesField, 0, 1, 2, 1);
 
         healthQuestionPane.add(new Label("Health Concerns:"), 0, 2);
-        healthQuestionPane.add(new TextField(), 0, 3, 2, 1);
+        TextField enterHealthConcernsField = new TextField();
+        healthQuestionPane.add(enterHealthConcernsField, 0, 3, 2, 1);
 
         healthQuestionPane.add(new Label("Previous Issues:"), 0, 4);
-        healthQuestionPane.add(new TextField(), 0, 5, 2, 1);
+        TextField enterIssuesField = new TextField();
+        healthQuestionPane.add(enterIssuesField, 0, 5, 2, 1);
 
         healthQuestionPane.add(new Label("Previous Medication:"), 0, 6);
-        healthQuestionPane.add(new TextField(), 0, 7, 2, 1);
+        TextField  enterPrevMedicaitonField = new TextField();
+        healthQuestionPane.add(enterPrevMedicaitonField, 0, 7, 2, 1);
 
         healthQuestionPane.add(new Label("Immunizations:"), 0, 8);
-        healthQuestionPane.add(new TextField(), 0, 9, 2, 1);
+        TextField enterImmunizationsField = new TextField();
+        healthQuestionPane.add(enterImmunizationsField, 0, 9, 2, 1);
 
         //lets the nurse know the information was entered and added to the patient's account
         Label responsesEnteredLabel = new Label("Responses Entered!");
@@ -334,6 +365,17 @@ public class DocOfficeProto extends Application {
         homeButton.setOnAction(actionEvent -> showHomeScreen(n));
 
         enterHealthQuestionsButton.setOnAction(actionEvent -> {
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(id)) {
+
+                    p.updateHistory("\nKnown Allergies: " + enterAllergiesField.getText() +
+                            "\nHealth Concerns: " + enterHealthConcernsField.getText() +
+                            "\nPrevious Issues: " + enterIssuesField.getText() +
+                            "\nPrevious Medication: " + enterPrevMedicaitonField.getText() +
+                            "\nImmunizations: " + enterImmunizationsField.getText() + "\n");
+                    break;
+                }
+            }
             responsesEnteredLabel.setVisible(true);
         });
     }
@@ -362,11 +404,14 @@ public class DocOfficeProto extends Application {
         homeButton.setOnAction(actionEvent -> showHomeScreen(d));
 
         saveFindingsButton.setOnAction(actionEvent -> {
-            String testFindings = testFindingsField.getText();
-            String existingHistory = patientHistory.getText();
-            String updatedHistory = existingHistory + "\n" + testFindings;
-            patientHistory.setText(updatedHistory);
-            testFindingsField.clear();
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    p.updateHistory("\nTest Findings: " + testFindingsField.getText().trim() + "\n");
+                    patientHistory.setText(p.getPatientHistory());
+                    testFindingsField.clear();
+                    break;
+                }
+            }
         });
 
         //gives the doctor the option to prescribe medication to the patient given their health concerns
@@ -380,25 +425,39 @@ public class DocOfficeProto extends Application {
         prescriptionReasonField.setVisible(false);
         Button savePrescriptionButton = new Button("Save Prescription");
         savePrescriptionButton.setVisible(false);
-        
+
         savePrescriptionButton.setOnAction(actionEvent -> {
-            String medicationName = medicationNameField.getText();
-            String existingmedicationName = patientHistory.getText();
-            String updatedHistory = existingmedicationName + "\n" + medicationName;
-            patientHistory.setText(updatedHistory);
-            testFindingsField.clear();
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    p.updateHistory("\nMedication Prescription: " + medicationNameField.getText().trim() + "\nReason: " + prescriptionReasonField.getText().trim() + "\n");
+                    patientHistory.setText(p.getPatientHistory());
+                    medicationNameField.clear();
+                    prescriptionReasonField.clear();
+                    break;
+                }
+            }
         });
 
         loadButton.setOnAction(actionEvent -> {
-            patientHistory.setVisible(true);
-            testFindingsLabel.setVisible(true);
-            testFindingsField.setVisible(true);
-            saveFindingsButton.setVisible(true);
-            prescribeLabel.setVisible(true);
-            medicationNameField.setVisible(true);
-            reasonLabel.setVisible(true);
-            prescriptionReasonField.setVisible(true);
-            savePrescriptionButton.setVisible(true);
+            boolean validPatient = false;
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    patientHistory.setText(p.getPatientHistory());
+                    validPatient = true;
+                    break;
+                }
+            }
+            if (validPatient) {
+                patientHistory.setVisible(true);
+                testFindingsLabel.setVisible(true);
+                testFindingsField.setVisible(true);
+                saveFindingsButton.setVisible(true);
+                prescribeLabel.setVisible(true);
+                medicationNameField.setVisible(true);
+                reasonLabel.setVisible(true);
+                prescriptionReasonField.setVisible(true);
+                savePrescriptionButton.setVisible(true);
+            }
         });
 
         viewPatientPane.add(enterPatientIDField, 0, 0);
@@ -416,7 +475,7 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(savePrescriptionButton, 2, 6);
     }
 
-    //allows users to send and receive/view messages from other people in the clinic 
+    //allows users to send and receive/view messages from other people in the clinic
     public void createMessagesPane(User u) {
         messagesPane = new VBox();
         messagesPane.setSpacing(10);
@@ -438,7 +497,7 @@ public class DocOfficeProto extends Application {
 
         TextField personIdTextField = new TextField();
 
-        
+
         //#######################################
         //Add messages from file here
         //#######################################
