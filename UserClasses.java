@@ -1,3 +1,5 @@
+package com.example.hw1360;
+
 import java.io.File;
 import java.time.LocalDate;
 
@@ -72,7 +74,7 @@ class User {
 
 //Following are classes for each type of user
 class Patient extends User{
-    private String history;
+    private String history = "History: ";
 
     public Patient(String firstName, String lastName, LocalDate birthDate, String phoneNumber) {
         super(firstName, lastName, birthDate, phoneNumber);
