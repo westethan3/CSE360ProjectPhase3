@@ -66,14 +66,24 @@ class User {
             System.out.println("File loaded successfully.");
         }
     }
- 
+
     public File getMessageLog() {return messageLog;}
 }
 
 //Following are classes for each type of user
 class Patient extends User{
+    private String history;
+
     public Patient(String firstName, String lastName, LocalDate birthDate, String phoneNumber) {
         super(firstName, lastName, birthDate, phoneNumber);
+    }
+
+    public void updateHistory(String newInfo) {
+        history += newInfo;
+    }
+
+    public String getPatientHistory() {
+        return history;
     }
 }
 
