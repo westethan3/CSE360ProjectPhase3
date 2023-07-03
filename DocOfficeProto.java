@@ -15,10 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
 
@@ -199,8 +196,6 @@ public class DocOfficeProto extends Application {
         Label nameLabel = new Label("Name - " + p.getFirstName() + " " + p.getLastName());
         Label phoneLabel = new Label("Phone - " + p.getPhoneNumber());
 
-        ///////////////////////////////
-
         TextArea historyTextArea = new TextArea();
         historyTextArea.setVisible(false);
         historyTextArea.setEditable(false);
@@ -209,8 +204,6 @@ public class DocOfficeProto extends Application {
             historyTextArea.setText(p.getPatientHistory());
             historyTextArea.setVisible(true);
         }
-
-        ///////////////////////////
 
         Button updateContactButton = new Button("Update Contact Information");
         updateContactButton.setOnAction(event -> showUpdateContactScreen(p));
@@ -495,12 +488,46 @@ public class DocOfficeProto extends Application {
 
         Label currentPersonLabel = new Label("Staff ID:");
 
+        Button loadIDMessagesButton = new Button("Load Messages");
+
         TextField personIdTextField = new TextField();
 
+        loadIDMessagesButton.setOnAction(actionEvent -> {
+            messagesContainer.getChildren().clear();
 
-        //#######################################
-        //Add messages from file here
-        //#######################################
+            String filePath1 = System.getProperty("user.dir") + File.separator + u.getUserID() + ".txt";
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath1))) {
+                String line;
+
+                boolean foundPhraseFrom = false;
+                boolean foundPhraseTo = false;
+
+                while ((line = reader.readLine()) != null) {
+                    if (foundPhraseFrom) {
+                        messagesContainer.getChildren().add(createMessageEntry(line, false));
+                        foundPhraseFrom = false;
+                        continue;
+                    }
+                    if (foundPhraseTo) {
+                        messagesContainer.getChildren().add(createMessageEntry(line, true));
+                        foundPhraseTo = false;
+                        continue;
+                    }
+
+                    foundPhraseFrom = false;
+                    foundPhraseTo = false;
+
+                    if (line.contains("From: " + personIdTextField.getText()) && !(personIdTextField.getText().isEmpty())) {
+                        foundPhraseFrom = true;
+                    } else if (line.contains("To: " + personIdTextField.getText()) && !(personIdTextField.getText().isEmpty())) {
+                        foundPhraseTo = true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         //gives the user the option to send a new message
         TextArea messageTextArea = new TextArea();
@@ -525,7 +552,6 @@ public class DocOfficeProto extends Application {
 
                 //option to make a new file to write in
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-
                     writer.write("To: " + personIdTextField.getText());
                     writer.newLine();
                     writer.write(messageTextArea.getText());
@@ -556,6 +582,7 @@ public class DocOfficeProto extends Application {
         //creates home button to return to home screen
         Button homeButton = new Button("Home");
         homeButton.setOnAction(event -> {
+
             if (u.getClass().equals(Patient.class)) {
                 showHomeScreenPatient((Patient) u);
             } else if (u.getClass().equals(Nurse.class)) {
@@ -569,6 +596,7 @@ public class DocOfficeProto extends Application {
         messagesPane.getChildren().addAll(
                 currentPersonLabel,
                 personIdTextField,
+                loadIDMessagesButton,
                 scrollPane,
                 messageTextArea,
                 sendButton,
