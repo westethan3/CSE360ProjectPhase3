@@ -106,17 +106,6 @@ public class DocOfficeProto extends Application {
     }
 
     //used to allow the users to create accounts by selecing specific options and entering the necessary data
-    public class PatientInfo {
-        private static String history = "";
-
-        public static String getHistory() {
-            return history;
-        }
-
-        public static void addToHistory(String content) {
-            history += "\n" + content;
-        }
-    }
     private void createCreateAccountPane() {
         createAccountPane = new GridPane();
         createAccountPane.setPadding(new Insets(10));
@@ -201,7 +190,7 @@ public class DocOfficeProto extends Application {
     }
 
     //patient home screen to allow them to view their history, messages, and update any contact information
-   private void createPatientHomePane(Patient p) {
+    private void createPatientHomePane(Patient p) {
         patientHomePane = new VBox();
         patientHomePane.setSpacing(10);
         patientHomePane.setPadding(new Insets(10));
@@ -210,9 +199,18 @@ public class DocOfficeProto extends Application {
         Label nameLabel = new Label("Name - " + p.getFirstName() + " " + p.getLastName());
         Label phoneLabel = new Label("Phone - " + p.getPhoneNumber());
 
+        ///////////////////////////////
+
         TextArea historyTextArea = new TextArea();
+        historyTextArea.setVisible(false);
         historyTextArea.setEditable(false);
-        historyTextArea.setText(PatientInfo.getHistory());
+
+        if (!(p.getPatientHistory() == null)) {
+            historyTextArea.setText("History: " + p.getPatientHistory());
+            historyTextArea.setVisible(true);
+        }
+
+        ///////////////////////////
 
         Button updateContactButton = new Button("Update Contact Information");
         updateContactButton.setOnAction(event -> showUpdateContactScreen(p));
@@ -392,11 +390,8 @@ public class DocOfficeProto extends Application {
         //screen for entering and viewing patient history and findings
         TextField enterPatientIDField = new TextField();
         Button loadButton = new Button("Load Patient ID");
-        
-        Label patientHistoryLabel = new Label("Patient History:");
-        patientHistoryLabel.setVisible(false);
-        
-        TextArea patientHistory = new TextArea();
+        TextArea patientHistory = new TextArea("Patient History:");
+        patientHistory.setEditable(false);
         patientHistory.setVisible(false);
         Label testFindingsLabel = new Label("Test Findings:");
         testFindingsLabel.setVisible(false);
@@ -409,12 +404,14 @@ public class DocOfficeProto extends Application {
         homeButton.setOnAction(actionEvent -> showHomeScreen(d));
 
         saveFindingsButton.setOnAction(actionEvent -> {
-            String testFindings = testFindingsField.getText();
-            String existingHistory = patientHistory.getText();
-            String updatedHistory = existingHistory + "\n" + testFindings;
-            patientHistory.setText(updatedHistory);
-            PatientInfo.addToHistory(testFindings);
-            testFindingsField.clear();
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    p.updateHistory("\nTest Findings: " + testFindingsField.getText().trim() + "\n");
+                    patientHistory.setText(p.getPatientHistory());
+                    testFindingsField.clear();
+                    break;
+                }
+            }
         });
 
         //gives the doctor the option to prescribe medication to the patient given their health concerns
@@ -428,29 +425,39 @@ public class DocOfficeProto extends Application {
         prescriptionReasonField.setVisible(false);
         Button savePrescriptionButton = new Button("Save Prescription");
         savePrescriptionButton.setVisible(false);
-        
+
         savePrescriptionButton.setOnAction(actionEvent -> {
-            String medicationName = medicationNameField.getText();
-            String prescriptionReason = prescriptionReasonField.getText();
-            String existingHistory = patientHistory.getText();
-            String updatedHistory =existingHistory + "\n" + medicationName + "\n" + prescriptionReason;
-            patientHistory.setText(updatedHistory);
-            PatientInfo.addToHistory(updatedHistory);
-            
-            testFindingsField.clear();
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    p.updateHistory("\nMedication Prescription: " + medicationNameField.getText().trim() + "\nReason: " + prescriptionReasonField.getText().trim() + "\n");
+                    patientHistory.setText(p.getPatientHistory());
+                    medicationNameField.clear();
+                    prescriptionReasonField.clear();
+                    break;
+                }
+            }
         });
 
         loadButton.setOnAction(actionEvent -> {
-        	patientHistoryLabel.setVisible(true);
-            patientHistory.setVisible(true);
-            testFindingsLabel.setVisible(true);
-            testFindingsField.setVisible(true);
-            saveFindingsButton.setVisible(true);
-            prescribeLabel.setVisible(true);
-            medicationNameField.setVisible(true);
-            reasonLabel.setVisible(true);
-            prescriptionReasonField.setVisible(true);
-            savePrescriptionButton.setVisible(true);
+            boolean validPatient = false;
+            for (Patient p: patientList) {
+                if (p.getUserID().equalsIgnoreCase(enterPatientIDField.getText().trim())) {
+                    patientHistory.setText(p.getPatientHistory());
+                    validPatient = true;
+                    break;
+                }
+            }
+            if (validPatient) {
+                patientHistory.setVisible(true);
+                testFindingsLabel.setVisible(true);
+                testFindingsField.setVisible(true);
+                saveFindingsButton.setVisible(true);
+                prescribeLabel.setVisible(true);
+                medicationNameField.setVisible(true);
+                reasonLabel.setVisible(true);
+                prescriptionReasonField.setVisible(true);
+                savePrescriptionButton.setVisible(true);
+            }
         });
 
         viewPatientPane.add(enterPatientIDField, 0, 0);
@@ -466,26 +473,6 @@ public class DocOfficeProto extends Application {
         viewPatientPane.add(reasonLabel, 2, 4, 1, 2);
         viewPatientPane.add(prescriptionReasonField, 2, 5);
         viewPatientPane.add(savePrescriptionButton, 2, 6);
-        
-        StringBuilder contentBuilder = new StringBuilder();
-        contentBuilder.append("private void createViewPatientDoctorPane(Doctor d) {");
-        contentBuilder.append(System.lineSeparator());
-        contentBuilder.append("\tviewPatientPane = new GridPane();");
-        contentBuilder.append(System.lineSeparator());
-        contentBuilder.append("\tviewPatientPane.setPadding(new Insets(10));");
-        // ... append the rest of the lines ...
-
-        // Convert StringBuilder to String
-        String content = contentBuilder.toString();
-
-        // Save the content to a file
-        String fileName = "viewPatientDoctorPane.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write(content);
-            System.out.println("Class content saved to file: " + fileName);
-        } catch (IOException e) {
-            System.out.println("An error occurred while saving the class content: " + e.getMessage());
-        }
     }
 
     //allows users to send and receive/view messages from other people in the clinic
