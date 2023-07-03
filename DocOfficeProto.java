@@ -205,8 +205,8 @@ public class DocOfficeProto extends Application {
         historyTextArea.setVisible(false);
         historyTextArea.setEditable(false);
 
-        if (!(p.getPatientHistory() == null)) {
-            historyTextArea.setText("History: " + p.getPatientHistory());
+        if (!(p.getPatientHistory().isBlank())) {
+            historyTextArea.setText(p.getPatientHistory());
             historyTextArea.setVisible(true);
         }
 
