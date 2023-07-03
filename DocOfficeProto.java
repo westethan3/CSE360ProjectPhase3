@@ -190,7 +190,7 @@ public class DocOfficeProto extends Application {
     }
 
     //patient home screen to allow them to view their history, messages, and update any contact information
-    private void createPatientHomePane(Patient p) {
+   private void createPatientHomePane(Patient p) {
         patientHomePane = new VBox();
         patientHomePane.setSpacing(10);
         patientHomePane.setPadding(new Insets(10));
@@ -198,19 +198,10 @@ public class DocOfficeProto extends Application {
         Label contactInfoLabel = new Label("Contact Information for " + p.getUserID() + ":");
         Label nameLabel = new Label("Name - " + p.getFirstName() + " " + p.getLastName());
         Label phoneLabel = new Label("Phone - " + p.getPhoneNumber());
-        
-        ///////////////////////////////
 
         TextArea historyTextArea = new TextArea();
-        historyTextArea.setVisible(false);
         historyTextArea.setEditable(false);
-        
-        if (!(p.getPatientHistory() == null)) {
-            historyTextArea.setText("History: " + p.getPatientHistory());
-            historyTextArea.setVisible(true);
-        }
-        
-        ///////////////////////////
+        historyTextArea.setText(PatientInfo.getHistory());
 
         Button updateContactButton = new Button("Update Contact Information");
         updateContactButton.setOnAction(event -> showUpdateContactScreen(p));
