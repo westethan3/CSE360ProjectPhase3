@@ -199,9 +199,9 @@ public class DocOfficeProto extends Application {
         Label nameLabel = new Label("Name - " + p.getFirstName() + " " + p.getLastName());
         Label phoneLabel = new Label("Phone - " + p.getPhoneNumber());
 
-        TextField historyTextField = new TextField();
-        historyTextField.setEditable(false);
-        historyTextField.setText("History:");
+        TextArea historyTextArea = new TextTextArea();
+        historyTextArea.setEditable(false);
+        historyTextArea.setText("History:");
 
         Button updateContactButton = new Button("Update Contact Information");
         updateContactButton.setOnAction(event -> showUpdateContactScreen(p));
@@ -217,7 +217,7 @@ public class DocOfficeProto extends Application {
                 nameLabel,
                 phoneLabel,
                 updateContactButton,
-                historyTextField,
+                historyTextArea,
                 messagesButton,
                 signOutButton
         );
